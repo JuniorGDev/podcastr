@@ -1,4 +1,5 @@
 import { format, parseISO } from 'date-fns';
+import id from 'date-fns/esm/locale/id/index.js';
 import { ptBR } from 'date-fns/locale';
 import { GetStaticPaths, GetStaticProps } from 'next';
 import Image from 'next/image';
@@ -54,9 +55,25 @@ export default function Episode({ episode }: EpisodeProps) {
 }
 
 export const getStaticPaths: GetStaticPaths = async () => {
+    const { data } = await api.get("episodes", {
+        params:{
+          _limit: 2,
+          _sort: 'published_at',
+          _order: 'desc',
+        }
+    });
+
+    const paths = data.map( episode => {
+        return{
+            params: {
+                slug: episode.id,
+            }
+        }
+    })
+    
     return{
-        paths: [],
-        fallback: 'blocking',
+        paths,
+        fallback: 'blocking', //Função que levara o usuario para tela somente quando estiver carregado.
     }
 }
 
